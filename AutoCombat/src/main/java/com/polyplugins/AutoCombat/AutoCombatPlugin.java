@@ -288,7 +288,7 @@ public class AutoCombatPlugin extends Plugin {
             if (event.getValue() <= 0 && config.shutdownOnTaskDone()) {
                 InventoryInteraction.useItem(supplies.findTeleport(), "Break");
                 EthanApiPlugin.sendClientMessage("Task done, stopping");
-                started = false;
+                resetEverything();
             }
         } else if (pid == VarPlayer.CANNON_AMMO) {
             if (event.getValue() <= ThreadLocalRandom.current().nextInt(4, 12)) {
