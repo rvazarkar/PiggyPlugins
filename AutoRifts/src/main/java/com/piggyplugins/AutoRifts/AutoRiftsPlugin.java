@@ -40,7 +40,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @PluginDescriptor(
-        name = "<html><font color=\"#FF9DF9\">[PP]</font> AutoRifts</html>",
+        name = "<html><font color=\"#FF9DF9\">[PP]</font> Auto Rifts</html>",
         description = "Guardians of the Rift",
         enabledByDefault = false,
         tags = {"ethan", "piggy"}
@@ -126,6 +126,7 @@ public class AutoRiftsPlugin extends Plugin {
         overlayManager.add(overlay);
         breakHandler.registerPlugin(this);
         timeout = 0;
+        timer = Instant.now();
     }
 
     @Override
@@ -137,6 +138,8 @@ public class AutoRiftsPlugin extends Plugin {
         pouchManager.deregister();
         riftState.deregister();
         timeout = 0;
+        toggle();
+        timer = Instant.now();
     }
 
     @Subscribe

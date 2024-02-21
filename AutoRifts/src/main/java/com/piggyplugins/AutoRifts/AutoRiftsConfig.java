@@ -3,7 +3,7 @@ package com.piggyplugins.AutoRifts;
 
 import net.runelite.client.config.*;
 
-@ConfigGroup("AutoRiftsConfig")
+@ConfigGroup("AutoRifts")
 public interface AutoRiftsConfig extends Config {
     @ConfigItem(
             keyName = "Toggle",
