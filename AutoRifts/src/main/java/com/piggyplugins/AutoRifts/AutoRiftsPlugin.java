@@ -184,13 +184,13 @@ public class AutoRiftsPlugin extends Plugin {
             return;
         }
 
-        var state = getState();
+        AutoRiftsState state = getState();
         overlay.overlayState = state.toString();
 
         if (EthanApiPlugin.isMoving()) {
             //Attempt to put runes in pouch where possible
             getInventoryRunes().ifPresent(widget -> {
-                var optPouch = getRunePouch();
+                Optional<Widget> optPouch = getRunePouch();
                 if (optPouch.isEmpty()) {
                     return;
                 }
@@ -199,7 +199,7 @@ public class AutoRiftsPlugin extends Plugin {
                     return;
                 }
 
-                var pouch = optPouch.get();
+                Widget pouch = optPouch.get();
                 MousePackets.queueClickPacket();
                 MousePackets.queueClickPacket();
                 WidgetPackets.queueWidgetOnWidget(widget, pouch);
@@ -399,7 +399,7 @@ public class AutoRiftsPlugin extends Plugin {
             return AutoRiftsState.USE_CELL;
         }
 
-        var essence = pouchManager.getEssenceInPouches() + Inventory.getItemAmount(ItemID.GUARDIAN_ESSENCE);
+        int essence = pouchManager.getEssenceInPouches() + Inventory.getItemAmount(ItemID.GUARDIAN_ESSENCE);
 
         if (essence > 20) {
             return AutoRiftsState.ENTER_ALTAR;
@@ -657,13 +657,13 @@ public class AutoRiftsPlugin extends Plugin {
             return;
         }
 
-        var dialog = Widgets.search().withId(15007475).hiddenState(false).first();
+        Optional<Widget> dialog = Widgets.search().withId(15007475).hiddenState(false).first();
         if (dialog.isEmpty()) {
             TileObjects.search().withName("Barrier").first().ifPresent(tileObject -> TileObjectInteraction.interact(tileObject, "Quick-pass"));
             return;
         }
 
-        var dialogText = dialog.get().getText();
+        String dialogText = dialog.get().getText();
         if (dialogText.contains("the rift is already being guarded")) {
             timeout = 10;
             clickContinue();
@@ -851,17 +851,17 @@ public class AutoRiftsPlugin extends Plugin {
             return;
         }
 
-        var optCell = Inventory.search().idInList(PoweredCellList).first();
+        Optional<Widget> optCell = Inventory.search().idInList(PoweredCellList).first();
         if (optCell.isEmpty()) {
             return;
         }
 
-        var cell = optCell.get();
-        var nextAltar = riftState.getNextAltar();
-        var cellTier = CellMapper.GetCellTier(cell.getItemId());
-        var shieldCells = TileObjects.search().nameContains("cell tile").result();
+        Widget cell = optCell.get();
+        TileObject nextAltar = riftState.getNextAltar();
+        int cellTier = CellMapper.GetCellTier(cell.getItemId());
+        List<TileObject> shieldCells = TileObjects.search().nameContains("cell tile").result();
         //Prioritize upgrading shield cells
-        for (var c : shieldCells) {
+        for (TileObject c : shieldCells) {
             if (CellMapper.GetShieldTier(c.getId()) < cellTier) {
                 log.info("Upgrading power cell at " + c.getWorldLocation());
                 TileObjectInteraction.interact(c, "Place-cell");
@@ -871,12 +871,12 @@ public class AutoRiftsPlugin extends Plugin {
         }
 
         if (nextAltar == null) {
-            var bestBarrier = NPCs.search()
+            Optional<NPC> bestBarrier = NPCs.search()
                     .filter(x -> x.getId() <= 11425 && x.getId() >= 11418)
                     .result().stream().min(Comparator.comparingDouble(this::getBarrierHealth));
 
             if (bestBarrier.isPresent()) {
-                var tile = TileObjects.search().nameContains("cell tile").nearestToPoint(bestBarrier.get().getWorldLocation());
+                Optional<TileObject> tile = TileObjects.search().nameContains("cell tile").nearestToPoint(bestBarrier.get().getWorldLocation());
                 if (tile.isPresent()) {
                     tile.ifPresent(tileObject -> TileObjectInteraction.interact(tileObject, "Place-cell"));
                     log.info("Placing power cell at " + tile.get().getWorldLocation() + " with no altar present");
@@ -884,9 +884,9 @@ public class AutoRiftsPlugin extends Plugin {
                 }
             }
         } else {
-            var damagedBarrier = NPCs.search().filter(x -> x.getId() <= 11425 && x.getId() >= 11418 && getBarrierHealth(x) <= 50).first();
+            Optional<NPC> damagedBarrier = NPCs.search().filter(x -> x.getId() <= 11425 && x.getId() >= 11418 && getBarrierHealth(x) <= 50).first();
             if (damagedBarrier.isPresent()) {
-                var tile = TileObjects.search().nameContains("cell tile").nearestToPoint(damagedBarrier.get().getWorldLocation());
+                Optional<TileObject> tile = TileObjects.search().nameContains("cell tile").nearestToPoint(damagedBarrier.get().getWorldLocation());
                 if (tile.isPresent()) {
                     log.info("Placing power cell at " + tile.get().getWorldLocation() + " to repair barrier");
                     TileObjectInteraction.interact(tile.get(), "Place-cell");
@@ -895,12 +895,12 @@ public class AutoRiftsPlugin extends Plugin {
                 }
             }
 
-            var bestBarrier = NPCs.search()
+            Optional<NPC> bestBarrier = NPCs.search()
                     .filter(x -> x.getId() <= 11425 && x.getId() >= 11418)
                     .result().stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(nextAltar.getWorldLocation())));
 
             if (bestBarrier.isPresent()) {
-                var tile = TileObjects.search().nameContains("cell tile").nearestToPoint(bestBarrier.get().getWorldLocation());
+                Optional<TileObject> tile = TileObjects.search().nameContains("cell tile").nearestToPoint(bestBarrier.get().getWorldLocation());
                 if (tile.isPresent()) {
                     log.info("Placing power cell at " + tile.get().getWorldLocation() + " nearest to next altar");
                     TileObjectInteraction.interact(tile.get(), "Place-cell");
@@ -934,7 +934,7 @@ public class AutoRiftsPlugin extends Plugin {
             Widget item = itemWidget.get();
             InventoryInteraction.useItem(item, "Drop");
         } else {
-            for (var rune : getDroppableRunes()) {
+            for (Widget rune : getDroppableRunes()) {
                 InventoryInteraction.useItem(rune, "Drop");
             }
         }
@@ -970,7 +970,7 @@ public class AutoRiftsPlugin extends Plugin {
     private TileObject lastAltar = null;
 
     private void enterRift() {
-        var nextAltar = riftState.getNextAltar();
+        TileObject nextAltar = riftState.getNextAltar();
         if (nextAltar == null) {
             return;
         }
@@ -998,7 +998,7 @@ public class AutoRiftsPlugin extends Plugin {
     }
 
     private int getFragmentCount() {
-        var frags = Inventory.search().withId(ItemID.GUARDIAN_FRAGMENTS).first();
+        Optional<Widget> frags = Inventory.search().withId(ItemID.GUARDIAN_FRAGMENTS).first();
         return frags.map(Widget::getItemQuantity).orElse(0);
     }
 }

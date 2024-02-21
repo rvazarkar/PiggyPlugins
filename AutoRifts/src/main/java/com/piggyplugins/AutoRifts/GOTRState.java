@@ -19,7 +19,9 @@ import net.runelite.client.eventbus.Subscribe;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -93,7 +95,7 @@ public class GOTRState {
                     Quest.MOURNINGS_END_PART_II.getState(client), Quest.SINS_OF_THE_FATHER.getState(client));
         }
 
-        var frags = Inventory.search().withId(ItemID.GUARDIAN_FRAGMENTS).first();
+        Optional<Widget> frags = Inventory.search().withId(ItemID.GUARDIAN_FRAGMENTS).first();
 
         if (!hasFirstPortalSpawned && (isPortalSpawned() || getPower() > 15 || (frags.isPresent() && frags.get().getItemQuantity() >= 250))) {
             hasFirstPortalSpawned = true;
@@ -117,12 +119,12 @@ public class GOTRState {
     }
 
     private int getPower() {
-        var pWidget = Widgets.search().withId(48889874).first();
+        Optional<Widget> pWidget = Widgets.search().withId(48889874).first();
         if (pWidget.isEmpty()) {
             return 0;
         }
 
-        var matcher = PERCENT_PATTERN.matcher(pWidget.get().getText());
+        Matcher matcher = PERCENT_PATTERN.matcher(pWidget.get().getText());
         if (matcher.find()) {
             return Integer.parseInt(matcher.group(1));
         } else {
@@ -149,7 +151,7 @@ public class GOTRState {
         }
 
         if (event.getType() == ChatMessageType.MESBOX) {
-            var checkPointMatcher = CHECK_POINT_PATTERN.matcher(event.getMessage());
+            Matcher checkPointMatcher = CHECK_POINT_PATTERN.matcher(event.getMessage());
             if (checkPointMatcher.find()) {
                 catalyticPoints = Integer.parseInt(checkPointMatcher.group(1));
                 elementalPoints = Integer.parseInt(checkPointMatcher.group(2));
@@ -172,7 +174,7 @@ public class GOTRState {
             isGameEnding = true;
         }
 
-        var rewardPointMatcher = REWARD_POINT_PATTERN.matcher(event.getMessage());
+        Matcher rewardPointMatcher = REWARD_POINT_PATTERN.matcher(event.getMessage());
         if (rewardPointMatcher.find()) {
             elementalPoints = Integer.parseInt(rewardPointMatcher.group(1).replaceAll(",", ""));
             catalyticPoints = Integer.parseInt(rewardPointMatcher.group(2).replaceAll(",", ""));
@@ -180,13 +182,13 @@ public class GOTRState {
     }
 
     private boolean isWidgetVisible() {
-        var widget = Widgets.search().withId(Constants.PARENT_WIDGET).first();
+        Optional<Widget> widget = Widgets.search().withId(Constants.PARENT_WIDGET).first();
         return widget.isPresent() && !widget.get().isHidden();
     }
 
 
     public boolean isInAltar() {
-        for (var region : client.getMapRegions()) {
+        for (int region : client.getMapRegions()) {
             if (GOTR_REGIONS.contains(region)) {
                 return false;
             }
@@ -211,7 +213,7 @@ public class GOTRState {
     }
 
     public boolean isPortalSpawned() {
-        var portalWidget = client.getWidget(PORTAL_WIDGET_ID);
+        Widget portalWidget = client.getWidget(PORTAL_WIDGET_ID);
         return portalWidget != null && !portalWidget.isHidden();
     }
 
@@ -390,7 +392,7 @@ public class GOTRState {
     }
 
     private boolean hasTalisman(TileObject altar) {
-        var talismanID = 0;
+        int talismanID = 0;
         switch (altar.getId()) {
             case AIR_ALTAR:
                 talismanID = ItemID.PORTAL_TALISMAN_AIR;

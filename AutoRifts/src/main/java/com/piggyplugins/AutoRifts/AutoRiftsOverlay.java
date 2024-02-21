@@ -27,7 +27,7 @@ public class AutoRiftsOverlay extends OverlayPanel {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        var timeFormat = (plugin.runningDuration.toHours() < 1) ? "mm:ss" : "HH:mm:ss";
+        String timeFormat = (plugin.runningDuration.toHours() < 1) ? "mm:ss" : "HH:mm:ss";
         panelComponent.getChildren().add(TitleComponent.builder()
                 .text("AutoRifts")
                 .color(plugin.started ? Color.GREEN : Color.RED)

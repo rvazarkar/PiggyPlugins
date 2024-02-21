@@ -136,9 +136,9 @@ public class PouchManager {
         for (Pouch pouch : result) {
             Optional<Widget> emptyPouch = Inventory.search().withId(pouch.getPouchID()).first();
             if (emptyPouch.isPresent()) {
-                var p = emptyPouch.get();
+                Widget p = emptyPouch.get();
                 InventoryInteraction.useItem(p, "Fill");
-                var essenceWithdrawn = pouch.getEssenceTotal() - pouch.getCurrentEssence();
+                int essenceWithdrawn = pouch.getEssenceTotal() - pouch.getCurrentEssence();
                 if (essenceAmount - essenceWithdrawn > 0) {
                     essenceAmount -= essenceWithdrawn;
                     pouch.setCurrentEssence(pouch.getEssenceTotal());
