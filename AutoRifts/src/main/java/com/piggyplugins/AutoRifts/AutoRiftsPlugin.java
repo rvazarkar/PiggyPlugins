@@ -112,6 +112,7 @@ public class AutoRiftsPlugin extends Plugin {
     public boolean started = false;
     public int timeout = 0;
     private boolean startingRun = false;
+    private boolean needsMoreStartingFragments = false;
 
     private boolean canEnterBarrier = false;
 
@@ -151,14 +152,14 @@ public class AutoRiftsPlugin extends Plugin {
         if (client.getGameState() != GameState.LOGGED_IN || !started || breakHandler.isBreakActive(this)) {
             return;
         }
-        
+
         if (Inventory.search().idInList(PickaxeIDs).first().isEmpty() && Equipment.search().idInList(PickaxeIDs).first().isEmpty()) {
             addMessage("No pickaxe found");
             setStarted(false);
             return;
         }
 
-        if (config.usePouches() && !hasNPCContactRunes() && !hasDegradePrevention()) {
+        if (config.usePouches() && !hasDegradePrevention() && (!hasNPCContactRunes() || !isOnLunar())) {
             addMessage("Must have a rune pouch with NPC contact runes or some form of prevention to use essence pouches");
             setStarted(false);
             return;
@@ -272,6 +273,12 @@ public class AutoRiftsPlugin extends Plugin {
     }
 
     private AutoRiftsState getState() {
+        if (config.startingFrags() > 0 && getFragmentCount() > config.startingFrags()) {
+            needsMoreStartingFragments = false;
+        } else if (config.startingFrags() == 0) {
+            needsMoreStartingFragments = true;
+        }
+
         if (!riftState.isGameStarted() && !riftState.isInAltar() && breakHandler.shouldBreak(this)) {
             return AutoRiftsState.BREAK;
         }
@@ -294,7 +301,7 @@ public class AutoRiftsPlugin extends Plugin {
             return getPregameState();
         }
 
-        if (!riftState.hasFirstPortalSpawned && (config.startingFrags() == 0 || getFragmentCount() < config.startingFrags())) {
+        if (!riftState.hasFirstPortalSpawned && needsMoreStartingFragments) {
             return getPreFirstPortalState();
         }
 
@@ -445,6 +452,10 @@ public class AutoRiftsPlugin extends Plugin {
     }
 
     private AutoRiftsState getPregameState() {
+        if (config.startingFrags() > 0) {
+            needsMoreStartingFragments = true;
+        }
+
         if (riftState.isInHugeMine()) {
             return AutoRiftsState.ENTER_PORTAL;
         }
@@ -732,6 +743,10 @@ public class AutoRiftsPlugin extends Plugin {
                 && client.getVarbitValue(Varbits.RUNE_POUCH_AMOUNT3) < 16000)
                 || (client.getVarbitValue(Varbits.RUNE_POUCH_RUNE4) == runeId
                 && client.getVarbitValue(Varbits.RUNE_POUCH_AMOUNT4) < 16000);
+    }
+
+    private boolean isOnLunar() {
+        return client.getVarbitValue(4070) == 2;
     }
 
     private boolean hasNPCContactRunes() {
