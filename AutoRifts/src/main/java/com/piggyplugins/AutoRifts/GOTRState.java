@@ -68,6 +68,10 @@ public class GOTRState {
         this.config = config;
     }
 
+    public void register() {
+        eventBus.register(this);
+    }
+
     public void deregister() {
         eventBus.unregister(this);
     }

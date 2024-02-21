@@ -128,6 +128,8 @@ public class AutoRiftsPlugin extends Plugin {
         breakHandler.registerPlugin(this);
         timeout = 0;
         timer = Instant.now();
+        pouchManager.register();
+        riftState.register();
     }
 
     @Override

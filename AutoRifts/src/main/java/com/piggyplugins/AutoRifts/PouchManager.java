@@ -34,6 +34,9 @@ public class PouchManager {
     @Inject
     public PouchManager(EventBus eventBus) {
         this.eventBus = eventBus;
+    }
+
+    public void register() {
         eventBus.register(this);
     }
 
