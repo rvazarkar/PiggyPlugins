@@ -143,17 +143,30 @@ public class gauntletFlicker extends Plugin {
                 if (rigourUnlocked() && !EthanApiPlugin.isQuickPrayerActive(QuickPrayer.RIGOUR)) {
                     MousePackets.queueClickPacket();
                     WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 24); //quickPrayer rigour
-                } else if (!rigourUnlocked() && !EthanApiPlugin.isQuickPrayerActive(QuickPrayer.EAGLE_EYE)) {
-                    MousePackets.queueClickPacket();
-                    WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 22); //quickPrayer eagle eye
+                } else if (!rigourUnlocked()) {
+                    if (!EthanApiPlugin.isQuickPrayerActive(QuickPrayer.EAGLE_EYE)) {
+                        MousePackets.queueClickPacket();
+                        WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 22); //quickPrayer eagle eye
+                    }
+
+                    if (!EthanApiPlugin.isQuickPrayerActive(QuickPrayer.STEEL_SKIN)) {
+                        MousePackets.queueClickPacket();
+                        WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 9); //quickPrayer steel skin
+                    }
                 }
             } else if (weaponTesting.contains("staff")) {
                 if (auguryUnlucked() && !EthanApiPlugin.isQuickPrayerActive(QuickPrayer.AUGURY)) {
                     MousePackets.queueClickPacket();
                     WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 27); //quickPrayer augury
-                } else if (!auguryUnlucked() && !EthanApiPlugin.isQuickPrayerActive(QuickPrayer.MYSTIC_MIGHT)) {
-                    MousePackets.queueClickPacket();
-                    WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 23); //quickPrayer mystic might
+                } else if (!auguryUnlucked()) {
+                    if (!EthanApiPlugin.isQuickPrayerActive(QuickPrayer.MYSTIC_MIGHT)) {
+                        MousePackets.queueClickPacket();
+                        WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 23); //quickPrayer mystic might
+                    }
+                    if (!EthanApiPlugin.isQuickPrayerActive(QuickPrayer.STEEL_SKIN)) {
+                        MousePackets.queueClickPacket();
+                        WidgetPackets.queueWidgetActionPacket(1, 5046276, -1, 9); //quickPrayer steel skin
+                    }
                 }
             } else if (weaponTesting.contains("halberd")) {
                 if (pietyUnlocked() && !EthanApiPlugin.isQuickPrayerActive(QuickPrayer.PIETY)) {
